@@ -432,6 +432,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            // Prüfe Mindestaufenthalt
+            if (nights < 5) {
+                alert('Es müssen mindestens 5 Nächte gebucht werden.');
+                return;
+            }
+
             // Prüfe Personenbeschränkungen
             const limits = personLimits[apartment];
             if (persons < limits.min || persons > limits.max) {
@@ -443,7 +449,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const basePrice = priceStructure[apartment][season].base;
             const perPersonPrice = priceStructure[apartment][season].perPerson;
             const totalPerNight = basePrice + (persons * perPersonPrice);
-            const totalPrice = totalPerNight * nights;
+            const accommodationPrice = totalPerNight * nights;
+            const cleaningFee = 40; // Endreinigung
+            const totalPrice = accommodationPrice + cleaningFee;
 
             // Ergebnisse anzeigen
             document.getElementById('result-apartment').textContent = apartmentNames[apartment];
@@ -452,6 +460,31 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('result-nights').textContent = nights;
             document.getElementById('result-price-per-night').textContent = totalPerNight.toFixed(2) + ' €';
             document.getElementById('result-total-price').textContent = totalPrice.toFixed(2) + ' €';
+            
+            // Zusätzliche Preisdetails anzeigen
+            const resultDetails = document.querySelector('.result-details');
+            if (resultDetails) {
+                // Füge Unterkunftspreis und Endreinigung hinzu
+                const accommodationRow = document.createElement('p');
+                accommodationRow.innerHTML = `<strong>Unterkunft (${nights} Nächte):</strong> <span>${accommodationPrice.toFixed(2)} €</span>`;
+                
+                const cleaningRow = document.createElement('p');
+                cleaningRow.innerHTML = `<strong>Endreinigung:</strong> <span>${cleaningFee.toFixed(2)} €</span>`;
+                
+                // Entferne alte Gesamtpreis-Zeile und füge neue hinzu
+                const totalPriceElement = resultDetails.querySelector('p:last-child');
+                if (totalPriceElement && totalPriceElement.textContent.includes('Gesamtpreis')) {
+                    totalPriceElement.remove();
+                }
+                
+                resultDetails.appendChild(accommodationRow);
+                resultDetails.appendChild(cleaningRow);
+                
+                // Gesamtpreis-Zeile aktualisieren
+                const newTotalRow = document.createElement('p');
+                newTotalRow.innerHTML = `<strong>Gesamtpreis:</strong> <span>${totalPrice.toFixed(2)} €</span>`;
+                resultDetails.appendChild(newTotalRow);
+            }
 
             // Ergebnis anzeigen
             const resultElement = document.getElementById('price-result');

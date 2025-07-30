@@ -10,22 +10,15 @@
 <body>
         <main class="main-content" id="main-content">
             <div class="pricing-section">
-                <h1 class="pricing-title">Die Preisliste</h1>
-                
-                <div class="pricing-image-container">
-                    <img src="images/preisliste.png" alt="Preisliste" class="pricing-image">
-                </div>
-                
-                <div class="pricing-info">
-                    <p>Für aktuelle Preise und Verfügbarkeit kontaktieren Sie uns gerne direkt.</p>
-                </div>
-            </div>
+
+            <h1 class="pricing-title">Preise</h1>
 
             <!-- Preisrechner -->
             <div class="price-calculator-section">
-                <h2 class="calculator-title">Preisrechner</h2>
                 
                 <div class="calculator-card">
+                    <h2 class="calculator-title">Preisrechner</h2>
+
                     <form id="price-calculator" class="calculator-form">
                         <div class="form-group">
                             <label for="apartment">Ferienwohnung:</label>
@@ -54,7 +47,8 @@
 
                         <div class="form-group">
                             <label for="nights">Anzahl Nächte:</label>
-                            <input type="number" id="nights" name="nights" min="1" max="30" value="7" required>
+                            <input type="number" id="nights" name="nights" min="5" max="30" value="7" required>
+                            <small class="form-help">Mindestaufenthalt: 5 Nächte</small>
                         </div>
 
                         <button type="submit" class="calculate-btn">Preis berechnen</button>
@@ -80,5 +74,16 @@
     </div>
 
     <script src="script.js"></script>
+
+        <h2 class="pricing-title">Die Preisliste</h1>
+        
+        <div class="pricing-image-container">
+            <img src="images/preisliste.png" alt="Preisliste" class="pricing-image">
+        </div>
+        
+        <div class="pricing-info">
+            <p>Für aktuelle Preise und Verfügbarkeit kontaktieren Sie uns gerne direkt.</p>
+        </div>
+    </div>
 </body>
 </html>
