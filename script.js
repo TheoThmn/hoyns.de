@@ -154,8 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
         position: absolute;
         top: -40px;
         left: 6px;
-        background: #667eea;
-        color: white;
         padding: 8px;
         text-decoration: none;
         border-radius: 4px;
@@ -241,4 +239,75 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialisiere Lightbox
     createLightbox();
+
+    // Navigation für Frame-basierte Struktur
+    const frameNavLinks = document.querySelectorAll('.nav-link[data-page]');
+    const contentFrame = document.getElementById('content-frame');
+    
+    frameNavLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Entferne active Klasse von allen Links
+            frameNavLinks.forEach(l => l.classList.remove('active'));
+            
+            // Füge active Klasse zum geklickten Link hinzu
+            this.classList.add('active');
+            
+            // Lade die entsprechende Seite im Frame
+            const page = this.getAttribute('data-page');
+            if (page === 'main') {
+                contentFrame.src = 'main.html';
+            } else {
+                contentFrame.src = this.href;
+            }
+            
+            // Höhe nach dem Laden anpassen
+            contentFrame.addEventListener('load', adjustIframeHeight);
+        });
+    });
+
+    // Setze initial active Link basierend auf aktueller URL
+    const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+    const activeLink = document.querySelector(`[data-page="${currentPage}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+
+    // Iframe Höhe automatisch anpassen
+    const adjustIframeHeight = () => {
+        const iframe = document.getElementById('content-frame');
+        if (iframe && iframe.contentWindow) {
+            try {
+                const iframeDocument = iframe.contentWindow.document;
+                const iframeBody = iframeDocument.body;
+                const iframeHtml = iframeDocument.documentElement;
+                
+                const height = Math.max(
+                    iframeBody.scrollHeight,
+                    iframeBody.offsetHeight,
+                    iframeHtml.clientHeight,
+                    iframeHtml.scrollHeight,
+                    iframeHtml.offsetHeight
+                );
+                
+                iframe.style.height = (height + 50) + 'px'; // 50px extra für Padding
+            } catch (e) {
+                // Fallback wenn iframe noch nicht geladen
+                iframe.style.height = '100vh';
+            }
+        }
+    };
+
+    // Höhe anpassen wenn iframe geladen ist
+    const iframe = document.getElementById('content-frame');
+    if (iframe) {
+        iframe.addEventListener('load', adjustIframeHeight);
+        
+        // Initial anpassen
+        setTimeout(adjustIframeHeight, 100);
+        
+        // Bei Resize anpassen
+        window.addEventListener('resize', adjustIframeHeight);
+    }
 }); 

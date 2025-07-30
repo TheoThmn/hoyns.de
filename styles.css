@@ -18,7 +18,11 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 1rem 0;
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
     overflow: hidden;
 }
 
@@ -56,9 +60,10 @@ body {
     display: flex;
     max-width: 1400px;
     margin: 0 auto;
+    margin-top: 146px; /* Platz für fixed header */
+    margin-left: 280px; /* Platz für fixed sidebar */
     min-height: calc(100vh - 146px);
     background: white;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
     border-radius: 0 0 12px 12px;
     overflow: hidden;
 }
@@ -69,7 +74,13 @@ body {
     background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
     border-right: 1px solid #dee2e6;
     padding: 2rem 0;
-    position: relative;
+    position: fixed;
+    top: 146px; /* Unter dem fixed header */
+    left: 0;
+    height: calc(100vh - 146px);
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    z-index: 999;
 }
 
 .sidebar::before {
@@ -122,23 +133,13 @@ body {
 /* Main Content */
 .main-content {
     flex: 1;
-    padding: 3rem;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 0;
+    margin-top: 0;
     position: relative;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
-.main-content::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('images/wasser_3_light.jpg') center/cover;
-    opacity: 0.05;
-    z-index: 1;
-}
+/* Removed violet line overlay */
 
 .welcome-section {
     position: relative;
@@ -193,6 +194,8 @@ body {
 @media (max-width: 1024px) {
     .container {
         flex-direction: column;
+        margin-top: 146px;
+        margin-left: 0; /* Kein Platz für Sidebar auf Tablet */
     }
     
     .sidebar {
@@ -200,6 +203,12 @@ body {
         border-right: none;
         border-bottom: 1px solid #dee2e6;
         padding: 1rem 0;
+        position: fixed;
+        top: 146px;
+        left: 0;
+        height: auto;
+        overflow-y: visible;
+        z-index: 999;
     }
     
     .nav-menu {
@@ -235,6 +244,16 @@ body {
     
     .header-image {
         max-height: 80px;
+    }
+    
+    .container {
+        margin-top: 100px; /* Kleinere Header-Höhe auf Mobile */
+        margin-left: 0; /* Kein Platz für Sidebar auf Mobile */
+    }
+    
+    .sidebar {
+        top: 100px; /* Angepasst für kleinere Header-Höhe */
+        left: 0;
     }
     
     .nav-menu {
@@ -752,16 +771,8 @@ html {
     transition: transform 0.3s ease;
 }
 
-.info-image-container:hover {
-    transform: translateY(-5px);
-}
 
-.info-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
+
 
 .welcome-message {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -800,76 +811,29 @@ html {
     }
 }
 
-/* Legal Page Styles */
-.legal-section {
-    position: relative;
-    z-index: 2;
-    max-width: 900px;
-    margin: 0 auto;
+
+
+/* Iframe Styles */
+#content-frame {
+    border: none;
+    outline: none;
+    width: 100%;
+    height: 100vh;
+    background: transparent;
+    overflow-y: auto;
 }
 
-.legal-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 2rem;
-    text-align: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+/* Frame Content Styles */
+body {
+    margin: 0;
+    padding: 3rem;
+    background: transparent !important;
 }
 
-.legal-subtitle {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 1.5rem;
-    border-bottom: 3px solid #667eea;
-    padding-bottom: 0.5rem;
-}
-
-.legal-content {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 12px;
+/* Für Seiten im Frame - entferne Container-Styles */
+.frame-content {
     padding: 2rem;
-    margin-top: 2rem;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.legal-text {
-    color: #495057;
-    line-height: 1.8;
-}
-
-.legal-text p {
-    margin-bottom: 1.5rem;
-    font-size: 1rem;
-}
-
-.legal-text p:last-child {
-    margin-bottom: 0;
-}
-
-/* Responsive Legal */
-@media (max-width: 768px) {
-    .legal-title {
-        font-size: 2rem;
-    }
-    
-    .legal-subtitle {
-        font-size: 1.5rem;
-    }
-    
-    .legal-content {
-        padding: 1.5rem;
-    }
-    
-    .legal-text p {
-        font-size: 0.95rem;
-    }
+    background: transparent;
 }
 
 /* Lightbox Styles */
@@ -879,7 +843,7 @@ html {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 9999;
+    z-index: 99999;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -952,14 +916,7 @@ html {
     transform: scale(1.1);
 }
 
-/* Hover-Effekt für klickbare Bilder */
-.gallery-image:hover,
-.hero-image:hover,
-.pricing-image:hover,
-.info-image:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-}
+
 
 /* Responsive Lightbox */
 @media (max-width: 768px) {
@@ -982,5 +939,64 @@ html {
         width: 40px;
         height: 40px;
         font-size: 1.5rem;
+    }
+} 
+
+/* Fixed Footer */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: white;
+    padding: 0.75rem 0;
+    z-index: 1001;
+    box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    text-align: center;
+}
+
+.footer-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Adjust container to account for fixed footer */
+.container {
+    margin-bottom: 60px; /* Space for fixed footer */
+}
+
+/* Responsive footer */
+@media (max-width: 768px) {
+    .footer {
+        padding: 0.5rem 0;
+    }
+    
+    .footer-link {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .container {
+        margin-bottom: 50px;
     }
 } 
