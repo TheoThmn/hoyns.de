@@ -454,36 +454,53 @@ document.addEventListener('DOMContentLoaded', function() {
             const totalPrice = accommodationPrice + cleaningFee;
 
             // Ergebnisse anzeigen
-            document.getElementById('result-apartment').textContent = apartmentNames[apartment];
-            document.getElementById('result-season').textContent = seasonNames[season];
-            document.getElementById('result-persons').textContent = persons;
-            document.getElementById('result-nights').textContent = nights;
-            document.getElementById('result-price-per-night').textContent = totalPerNight.toFixed(2) + ' €';
-            document.getElementById('result-total-price').textContent = totalPrice.toFixed(2) + ' €';
+            const resultApartment = document.getElementById('result-apartment');
+            const resultSeason = document.getElementById('result-season');
+            const resultPersons = document.getElementById('result-persons');
+            const resultNights = document.getElementById('result-nights');
+            const resultPricePerNight = document.getElementById('result-price-per-night');
+            const resultTotalPrice = document.getElementById('result-total-price');
+
+            if (resultApartment) resultApartment.textContent = apartmentNames[apartment];
+            if (resultSeason) resultSeason.textContent = seasonNames[season];
+            if (resultPersons) resultPersons.textContent = persons;
+            if (resultNights) resultNights.textContent = nights;
+            if (resultPricePerNight) resultPricePerNight.textContent = totalPerNight.toFixed(2) + ' €';
+            if (resultTotalPrice) resultTotalPrice.textContent = totalPrice.toFixed(2) + ' €';
             
             // Zusätzliche Preisdetails anzeigen
             const resultDetails = document.querySelector('.result-details');
             if (resultDetails) {
-                // Füge Unterkunftspreis und Endreinigung hinzu
+                // Entferne alle alten dynamischen Zeilen (Unterkunft, Endreinigung)
+                const dynamicRows = resultDetails.querySelectorAll('p');
+                dynamicRows.forEach(row => {
+                    if (row.textContent.includes('Unterkunft') || 
+                        row.textContent.includes('Endreinigung')) {
+                        row.remove();
+                    }
+                });
+                
+                // Füge neue Unterkunftspreis und Endreinigung hinzu
                 const accommodationRow = document.createElement('p');
                 accommodationRow.innerHTML = `<strong>Unterkunft (${nights} Nächte):</strong> <span>${accommodationPrice.toFixed(2)} €</span>`;
                 
                 const cleaningRow = document.createElement('p');
                 cleaningRow.innerHTML = `<strong>Endreinigung:</strong> <span>${cleaningFee.toFixed(2)} €</span>`;
                 
-                // Entferne alte Gesamtpreis-Zeile und füge neue hinzu
-                const totalPriceElement = resultDetails.querySelector('p:last-child');
-                if (totalPriceElement && totalPriceElement.textContent.includes('Gesamtpreis')) {
-                    totalPriceElement.remove();
+                // Füge die neuen Zeilen vor der Gesamtpreis-Zeile ein
+                const totalPriceRow = resultDetails.querySelector('p:last-child');
+                if (totalPriceRow && totalPriceRow.textContent.includes('Gesamtpreis')) {
+                    resultDetails.insertBefore(accommodationRow, totalPriceRow);
+                    resultDetails.insertBefore(cleaningRow, totalPriceRow);
+                } else {
+                    resultDetails.appendChild(accommodationRow);
+                    resultDetails.appendChild(cleaningRow);
                 }
                 
-                resultDetails.appendChild(accommodationRow);
-                resultDetails.appendChild(cleaningRow);
-                
                 // Gesamtpreis-Zeile aktualisieren
-                const newTotalRow = document.createElement('p');
-                newTotalRow.innerHTML = `<strong>Gesamtpreis:</strong> <span>${totalPrice.toFixed(2)} €</span>`;
-                resultDetails.appendChild(newTotalRow);
+                if (resultTotalPrice) {
+                    resultTotalPrice.textContent = totalPrice.toFixed(2) + ' €';
+                }
             }
 
             // Ergebnis anzeigen
