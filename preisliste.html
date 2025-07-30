@@ -20,6 +20,62 @@
                     <p>Für aktuelle Preise und Verfügbarkeit kontaktieren Sie uns gerne direkt.</p>
                 </div>
             </div>
+
+            <!-- Preisrechner -->
+            <div class="price-calculator-section">
+                <h2 class="calculator-title">Preisrechner</h2>
+                
+                <div class="calculator-card">
+                    <form id="price-calculator" class="calculator-form">
+                        <div class="form-group">
+                            <label for="apartment">Ferienwohnung:</label>
+                            <select id="apartment" name="apartment" required>
+                                <option value="">Bitte wählen...</option>
+                                <option value="ferienwohnung1">Ferienwohnung 1</option>
+                                <option value="ferienwohnung2">Ferienwohnung 2</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="season">Saison:</label>
+                            <select id="season" name="season" required>
+                                <option value="">Bitte wählen...</option>
+                                <option value="hauptsaison">Hauptsaison (Juni - August)</option>
+                                <option value="nebensaison">Nebensaison (März - Mai, September - Oktober)</option>
+                                <option value="winter">Winter (November - Februar)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="persons">Anzahl Personen:</label>
+                            <input type="number" id="persons" name="persons" min="2" max="4" value="2" required>
+                            <small class="form-help">Ferienwohnung 1: 2-4 Personen, Ferienwohnung 2: genau 2 Personen</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nights">Anzahl Nächte:</label>
+                            <input type="number" id="nights" name="nights" min="1" max="30" value="7" required>
+                        </div>
+
+                        <button type="submit" class="calculate-btn">Preis berechnen</button>
+                    </form>
+
+                    <div id="price-result" class="price-result" style="display: none;">
+                        <h3>Ihre Preisberechnung</h3>
+                        <div class="result-details">
+                            <p><strong>Ferienwohnung:</strong> <span id="result-apartment"></span></p>
+                            <p><strong>Saison:</strong> <span id="result-season"></span></p>
+                            <p><strong>Personen:</strong> <span id="result-persons"></span></p>
+                            <p><strong>Nächte:</strong> <span id="result-nights"></span></p>
+                            <p><strong>Preis pro Nacht:</strong> <span id="result-price-per-night"></span></p>
+                            <p><strong>Gesamtpreis:</strong> <span id="result-total-price"></span></p>
+                        </div>
+                        <div class="result-note">
+                            <p><em>* Dies ist eine unverbindliche Preisberechnung. Für genaue Preise und Verfügbarkeit kontaktieren Sie uns bitte direkt.</em></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 

@@ -177,68 +177,109 @@ document.addEventListener('DOMContentLoaded', function() {
         mainContent.id = 'main-content';
     }
 
-    // Lightbox für Bilder
-    const createLightbox = () => {
-        // Erstelle Lightbox Container
-        const lightbox = document.createElement('div');
-        lightbox.className = 'lightbox';
-        lightbox.innerHTML = `
-            <div class="lightbox-overlay"></div>
-            <div class="lightbox-content">
-                <button class="lightbox-close">&times;</button>
-                <img class="lightbox-image" src="" alt="">
-                <div class="lightbox-caption"></div>
-            </div>
-        `;
-        document.body.appendChild(lightbox);
+    // Global Lightbox für Bilder - nur im main document
+    const createGlobalLightbox = () => {
+        // Prüfe ob wir im main document sind (nicht in iframe)
+        if (window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/')) {
+            // Erstelle Lightbox Container im main document
+            const lightbox = document.createElement('div');
+            lightbox.className = 'lightbox';
+            lightbox.innerHTML = `
+                <div class="lightbox-overlay"></div>
+                <div class="lightbox-content">
+                    <button class="lightbox-close">&times;</button>
+                    <img class="lightbox-image" src="" alt="">
+                    <div class="lightbox-caption"></div>
+                </div>
+            `;
+            document.body.appendChild(lightbox);
 
-        // Event Listeners für Lightbox
-        const overlay = lightbox.querySelector('.lightbox-overlay');
-        const closeBtn = lightbox.querySelector('.lightbox-close');
-        const lightboxImage = lightbox.querySelector('.lightbox-image');
-        const caption = lightbox.querySelector('.lightbox-caption');
+            // Event Listeners für Lightbox
+            const overlay = lightbox.querySelector('.lightbox-overlay');
+            const closeBtn = lightbox.querySelector('.lightbox-close');
+            const lightboxImage = lightbox.querySelector('.lightbox-image');
+            const caption = lightbox.querySelector('.lightbox-caption');
 
-        // Schließen der Lightbox
-        const closeLightbox = () => {
-            lightbox.classList.remove('active');
-            document.body.style.overflow = '';
-        };
+            // Schließen der Lightbox
+            const closeLightbox = () => {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+            };
 
-        overlay.addEventListener('click', closeLightbox);
-        closeBtn.addEventListener('click', closeLightbox);
+            overlay.addEventListener('click', closeLightbox);
+            closeBtn.addEventListener('click', closeLightbox);
 
-        // ESC Taste zum Schließen
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && lightbox.classList.contains('active')) {
-                closeLightbox();
-            }
-        });
-
-        // Klick auf Bilder zum Öffnen
-        const galleryImages = document.querySelectorAll('.gallery-image, .hero-image, .pricing-image, .info-image');
-        galleryImages.forEach(img => {
-            img.style.cursor = 'pointer';
-            img.addEventListener('click', () => {
-                lightboxImage.src = img.src;
-                lightboxImage.alt = img.alt;
-                
-                // Caption aus dem Titel des Gallery-Items oder Alt-Text
-                const galleryItem = img.closest('.gallery-item');
-                if (galleryItem) {
-                    const title = galleryItem.querySelector('.gallery-title');
-                    caption.textContent = title ? title.textContent : img.alt;
-                } else {
-                    caption.textContent = img.alt;
+            // ESC Taste zum Schließen
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+                    closeLightbox();
                 }
-                
+            });
+
+            // Funktion zum Öffnen der Lightbox
+            window.openLightbox = (imgSrc, imgAlt, captionText) => {
+                lightboxImage.src = imgSrc;
+                lightboxImage.alt = imgAlt;
+                caption.textContent = captionText || imgAlt;
                 lightbox.classList.add('active');
                 document.body.style.overflow = 'hidden';
-            });
-        });
+            };
+
+            // Event Listener für Bilder im main document
+            const addImageListeners = () => {
+                const galleryImages = document.querySelectorAll('.gallery-image, .hero-image, .pricing-image, .info-image');
+                galleryImages.forEach(img => {
+                    img.style.cursor = 'pointer';
+                    img.addEventListener('click', () => {
+                        const galleryItem = img.closest('.gallery-item');
+                        let captionText = img.alt;
+                        
+                        if (galleryItem) {
+                            const title = galleryItem.querySelector('.gallery-title');
+                            captionText = title ? title.textContent : img.alt;
+                        }
+                        
+                        window.openLightbox(img.src, img.alt, captionText);
+                    });
+                });
+            };
+
+            // Initial für main document
+            addImageListeners();
+
+            // Für iframe content - Event Listener für iframe load
+            const iframe = document.getElementById('content-frame');
+            if (iframe) {
+                iframe.addEventListener('load', () => {
+                    try {
+                        const iframeDoc = iframe.contentWindow.document;
+                        const iframeImages = iframeDoc.querySelectorAll('.gallery-image, .hero-image, .pricing-image, .info-image');
+                        
+                        iframeImages.forEach(img => {
+                            img.style.cursor = 'pointer';
+                            img.addEventListener('click', () => {
+                                const galleryItem = img.closest('.gallery-item');
+                                let captionText = img.alt;
+                                
+                                if (galleryItem) {
+                                    const title = galleryItem.querySelector('.gallery-title');
+                                    captionText = title ? title.textContent : img.alt;
+                                }
+                                
+                                window.openLightbox(img.src, img.alt, captionText);
+                            });
+                        });
+                    } catch (e) {
+                        // Cross-origin error handling
+                        console.log('Iframe content not accessible for lightbox');
+                    }
+                });
+            }
+        }
     };
 
-    // Initialisiere Lightbox
-    createLightbox();
+    // Initialisiere Global Lightbox
+    createGlobalLightbox();
 
     // Navigation für Frame-basierte Struktur
     const frameNavLinks = document.querySelectorAll('.nav-link[data-page]');
@@ -309,5 +350,113 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Bei Resize anpassen
         window.addEventListener('resize', adjustIframeHeight);
+    }
+
+    // Price Calculator Functionality
+    const priceCalculator = document.getElementById('price-calculator');
+    if (priceCalculator) {
+        // Preisstruktur
+        const priceStructure = {
+            ferienwohnung1: {
+                hauptsaison: { base: 60, perPerson: 5 },
+                nebensaison: { base: 50, perPerson: 5 },
+                winter: { base: 50, perPerson: 5 }
+            },
+            ferienwohnung2: {
+                hauptsaison: { base: 60, perPerson: 5 },
+                nebensaison: { base: 50, perPerson: 5 },
+                winter: { base: 50, perPerson: 5 }
+            }
+        };
+
+        // Personenbeschränkungen
+        const personLimits = {
+            ferienwohnung1: { min: 2, max: 4 },
+            ferienwohnung2: { min: 2, max: 2 }
+        };
+
+        // Dynamische Anpassung der Personenbeschränkungen
+        const apartmentSelect = document.getElementById('apartment');
+        const personsInput = document.getElementById('persons');
+        const formHelp = document.querySelector('.form-help');
+
+        if (apartmentSelect && personsInput) {
+            apartmentSelect.addEventListener('change', function() {
+                const selectedApartment = this.value;
+                if (selectedApartment) {
+                    const limits = personLimits[selectedApartment];
+                    personsInput.min = limits.min;
+                    personsInput.max = limits.max;
+                    
+                    // Setze Personenanzahl auf Minimum wenn aktueller Wert nicht erlaubt ist
+                    if (parseInt(personsInput.value) < limits.min || parseInt(personsInput.value) > limits.max) {
+                        personsInput.value = limits.min;
+                    }
+                    
+                    // Update help text
+                    if (formHelp) {
+                        if (limits.min === limits.max) {
+                            formHelp.textContent = `Ferienwohnung ${selectedApartment === 'ferienwohnung1' ? '1' : '2'}: genau ${limits.min} Personen`;
+                        } else {
+                            formHelp.textContent = `Ferienwohnung ${selectedApartment === 'ferienwohnung1' ? '1' : '2'}: ${limits.min}-${limits.max} Personen`;
+                        }
+                    }
+                }
+            });
+        }
+
+        // Saison-Namen für Anzeige
+        const seasonNames = {
+            hauptsaison: 'Hauptsaison (Juni - August)',
+            nebensaison: 'Nebensaison (März - Mai, September - Oktober)',
+            winter: 'Winter (November - Februar)'
+        };
+
+        // Apartment-Namen für Anzeige
+        const apartmentNames = {
+            ferienwohnung1: 'Ferienwohnung 1',
+            ferienwohnung2: 'Ferienwohnung 2'
+        };
+
+        priceCalculator.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const apartment = formData.get('apartment');
+            const season = formData.get('season');
+            const persons = parseInt(formData.get('persons'));
+            const nights = parseInt(formData.get('nights'));
+
+            if (!apartment || !season) {
+                alert('Bitte wählen Sie eine Ferienwohnung und Saison aus.');
+                return;
+            }
+
+            // Prüfe Personenbeschränkungen
+            const limits = personLimits[apartment];
+            if (persons < limits.min || persons > limits.max) {
+                alert(`Ferienwohnung ${apartment === 'ferienwohnung1' ? '1' : '2'} kann nur von ${limits.min} bis ${limits.max} Personen gebucht werden.`);
+                return;
+            }
+
+            // Preisberechnung
+            const basePrice = priceStructure[apartment][season].base;
+            const perPersonPrice = priceStructure[apartment][season].perPerson;
+            const totalPerNight = basePrice + (persons * perPersonPrice);
+            const totalPrice = totalPerNight * nights;
+
+            // Ergebnisse anzeigen
+            document.getElementById('result-apartment').textContent = apartmentNames[apartment];
+            document.getElementById('result-season').textContent = seasonNames[season];
+            document.getElementById('result-persons').textContent = persons;
+            document.getElementById('result-nights').textContent = nights;
+            document.getElementById('result-price-per-night').textContent = totalPerNight.toFixed(2) + ' €';
+            document.getElementById('result-total-price').textContent = totalPrice.toFixed(2) + ' €';
+
+            // Ergebnis anzeigen
+            const resultElement = document.getElementById('price-result');
+            resultElement.style.display = 'block';
+            resultElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
     }
 }); 
